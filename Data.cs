@@ -12,7 +12,7 @@ namespace ArhivUtility {
 		public string Subfond { get; set; }
 		public string Directia { get; set; }
 		public string Compartiment { get; set; }
-		public string DirectiaCompartiment => (Directia ?? "" + " " + Compartiment ?? "").Trim();
+		public string DirectiaCompartiment => ((Directia ?? "") + " - " + (Compartiment ?? "")).Trim();
 		public int AnInceput { get; set; }
 		public int AnSfarsit { get; set; }
 		public string TermenPastrare { get; set; }
@@ -58,9 +58,9 @@ namespace ArhivUtility {
 				.ToArray();
 		}
 
-		public int[] RetrieveAniInceput(string compartiment = null, string termenPastrare = null) {
+		public int[] RetrieveAniInceput(string directiaCompartiment = null, string termenPastrare = null) {
 			return Dosare
-				.Where(data => ((compartiment != null) ? data.Compartiment == compartiment : true) &&
+				.Where(data => ((directiaCompartiment != null) ? data.DirectiaCompartiment == directiaCompartiment : true) &&
 				               ((termenPastrare != null) ? data.TermenPastrare == termenPastrare : true))
 				.Select(data => data.AnInceput)
 				.Distinct()
@@ -75,10 +75,10 @@ namespace ArhivUtility {
 				.ToArray();
 		}
 
-		public CentralizatorData RetrieveFiltered(string compartiment, string termenPastrare, int an, string subfond = null) {
+		public CentralizatorData RetrieveFiltered(string directiaCompartiment, string termenPastrare, int an, string subfond = null) {
 			return new CentralizatorData() {
 				Dosare = Dosare
-					.Where(data => data.Compartiment == compartiment &&
+					.Where(data => data.DirectiaCompartiment == directiaCompartiment &&
 								   data.TermenPastrare == termenPastrare &&
 								   data.AnInceput == an &&
 								   (subfond != null ? data.Subfond == subfond : true))

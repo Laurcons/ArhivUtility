@@ -179,7 +179,7 @@ namespace ArhivUtility {
 						worksheet.Cells[row, "N"].Value.ToString() : // this fuckery might not be needed but i ain't risking shit
 						"";
 					data.Continut = worksheet.Cells[row, "O"].Value.ToString();
-					data.DateExtreme = worksheet.Cells[row, "P"].Value.ToString();
+					data.DateExtreme = Convert.ToString(worksheet.Cells[row, "P"].Value2);
 					data.NrFile = (int)(Convert.ToDouble(worksheet.Cells[row, "Q"].Value) ?? 0.0);
 					data.Observatii = worksheet.Cells[row, "R"].Value != null ?
 						worksheet.Cells[row, "R"].Value.ToString() :
@@ -462,7 +462,7 @@ namespace ArhivUtility {
 							// calculate the number of dosare
 							int dosareCount = dateAni.Sum(data => data.Value.Dosare.Count);
 							// decide whether to create this file or not
-							if (aniInceput.Length == 0) {
+							if (aniInceput.Length == 0 || dosareCount == 0) {
 								//ReportProgress(progress, $"- {compartiment} {termenPastrare} - Nu exista ani");
 								continue;
 							}
@@ -658,6 +658,7 @@ namespace ArhivUtility {
 					}
 				}
 			}
+			else workbook.Close();
 		}
 	}
 }
