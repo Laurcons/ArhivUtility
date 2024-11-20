@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ArhivUtility")]
-[assembly: AssemblyDescription("Utilitate creata pentru a genera inventare si registre din centralizatoare.")]
+[assembly: AssemblyDescription("Utilitate creata pentru a genera inventare si registre din centralizatoare. Proiect open-source, codul sursa disponibil pe Github: https://github.com/laurcons/arhivutility")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ArhivUtility")]
-[assembly: AssemblyCopyright("Copyright Pricop Laurentiu © 2020")]
+[assembly: AssemblyCopyright("Pricop Laurentiu, 2020-2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.2.8.294")]
+[assembly: AssemblyVersion("0.2.9")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
