@@ -20,7 +20,6 @@ namespace ArhivUtility {
       Hide();
       Opacity = 0;
       _splashForm = new SplashForm();
-      _splashForm.Show();
       Warnings = new List<Warning>();
       // get version
       var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -225,13 +224,17 @@ namespace ArhivUtility {
     private void Form1_Load(object sender, EventArgs e) {
       Work.ProgressChanged += (obj, ev) => worker.ReportProgress(ev.ProgressPercentage, ev.UserState);
       Application.ApplicationExit += Work.StopApplication;
-      loadWorker.RunWorkerAsync();
+      _splashForm.Show();
       // resize event
       Size = new Size(Size.Width + 1, Size.Height + 1); // set to sth just for the event
       // update checker
       AutoUpdater.RunUpdateAsAdmin = false;
-      AutoUpdater.ApplicationExitEvent += () => { Work.StopApplication(); };
+      AutoUpdater.Mandatory = true;
+      AutoUpdater.UpdateMode = Mode.ForcedDownload;
+      //AutoUpdater.ApplicationExitEvent += () => { Work.StopApplication(); };
+      AutoUpdater.Synchronous = true;
       AutoUpdater.Start("https://static.laurcons.ro/arhivutility/autoupdater.xml");
+      loadWorker.RunWorkerAsync();
     }
 
     private void runChecksButton_Click(object sender, EventArgs e) {
