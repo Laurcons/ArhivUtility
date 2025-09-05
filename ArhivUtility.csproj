@@ -104,6 +104,8 @@
     <Compile Include="SplashForm.Designer.cs">
       <DependentUpon>SplashForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="TrackingService.cs" />
+    <Compile Include="UpdateController.cs" />
     <Compile Include="Warning.cs" />
     <Compile Include="WarningsForm.cs">
       <SubType>Form</SubType>

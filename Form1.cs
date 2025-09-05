@@ -1,5 +1,4 @@
-﻿using AutoUpdaterDotNET;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -70,18 +69,26 @@ namespace ArhivUtility {
       this.Invoke((Action)delegate {
         worker_DoUIPreWork();
       });
-      if (_currentWorkType == WorkType.Read)
+      if (_currentWorkType == WorkType.Read) {
+        TrackingService.TrackEvent("Process Centralizator", new { fileName = _currentFilePath });
         Work.DoReadWork(_currentFilePath);
+      }
       if (_currentWorkType == WorkType.Check) {
         // get the parts to check thing
         var tuple = (Tuple<bool, bool, bool>)e.Argument;
+        TrackingService.TrackEvent("Check Centralizator", new { fileName = _currentFilePath });
         Work.DoCheckWork(checkUA: tuple.Item1, checkDates: tuple.Item2, checkIndicative: tuple.Item3);
       }
-      if (_currentWorkType == WorkType.Write)
+      if (_currentWorkType == WorkType.Write) {
+        TrackingService.TrackEvent("Generate Centralizator Annexes", new {
+          fileName = _currentFilePath,
+          generateRegistry = generateRegistruCheckbox.Checked,
+        });
         Work.DoWriteWork(_currentFilePath,
           generateRegistruCheckbox.Checked,
           displayWarningsInInventareCheckBox.Checked,
           generateDateCheckbox.Checked ? registreDatePicker.Value : (DateTime?)null);
+      }
       GC.Collect();
       GC.WaitForPendingFinalizers();
     }
@@ -139,6 +146,11 @@ namespace ArhivUtility {
         if (e.Error.InnerException != null)
           msg += $"Detalii adiționale:\n" +
             $"{e.Error.InnerException.Message}";
+        TrackingService.TrackEvent("Work Error", new {
+          message = e.Error.Message,
+          action = e.Error is DataFormatException ? ((DataFormatException)e.Error).Action : "none",
+          inner = e.Error.InnerException != null ? e.Error.InnerException.Message : "none"
+        });
         // open a file stream and try to write data about the exception
         try {
           string fileText = "";
@@ -227,14 +239,10 @@ namespace ArhivUtility {
       _splashForm.Show();
       // resize event
       Size = new Size(Size.Width + 1, Size.Height + 1); // set to sth just for the event
-      // update checker
-      AutoUpdater.RunUpdateAsAdmin = false;
-      AutoUpdater.Mandatory = true;
-      AutoUpdater.UpdateMode = Mode.ForcedDownload;
-      //AutoUpdater.ApplicationExitEvent += () => { Work.StopApplication(); };
-      AutoUpdater.Synchronous = true;
-      AutoUpdater.Start("https://static.laurcons.ro/arhivutility/autoupdater.xml");
+      UpdateController.PerformUpdates();
       loadWorker.RunWorkerAsync();
+
+      TrackingService.TrackEvent("App Started", new { });
     }
 
     private void runChecksButton_Click(object sender, EventArgs e) {
