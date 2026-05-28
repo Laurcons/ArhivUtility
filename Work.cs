@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using ArhivUtility.Adapters;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ArhivUtility {
@@ -66,53 +67,37 @@ namespace ArhivUtility {
 
       ReportProgress(10, "Se parcurg datele din centralizator...");
 
+      // Auto-detect adapter based on worksheet structure
+      _currentAction = "Detectare format centralizator";
+      ICentralizatorAdapter adapter = CentralizatorAdapterFactory.DetectAdapter(worksheet);
+      ReportMessage($"Format detectat: {adapter.DisplayName}");
+
       ReportProgress(10, "- Se obtin datele firmei...");
       try {
         // find the "Date Arvutil" row in 'date identificare'
         _currentAction = "Deschidere foaie de lucru \"Date identificare\" din centralizator";
         Excel._Worksheet dateWorksheet = workbook.Sheets["Date identificare"];
-        _currentAction = "Cautare meta date: Date Arvutil, si Denumiri anterioare";
-        row = 1;
-        int maxRows = 200; bool foundDate = false; bool foundDenumiri = false;
-        while (row < maxRows && (!foundDate || !foundDenumiri)) {
-          if ((dateWorksheet.Cells[row, "A"].Value ?? "").Trim() == "Date Arvutil") {
-            _currentAction = "Parcurgere meta date: Date Arvutil";
-            foundDate = true;
-            // retrieve data
-            var dateFirma = _centralizator.DateFirma;
-            dateFirma.Nume = dateWorksheet.Cells[row + 0, "B"].Value.ToString();
-            dateFirma.Judet = dateWorksheet.Cells[row + 1, "B"].Value.ToString();
-            dateFirma.Localitate = dateWorksheet.Cells[row + 2, "B"].Value.ToString();
-            dateFirma.Adresa = dateWorksheet.Cells[row + 3, "B"].Value.ToString();
-            dateFirma.CUI = dateWorksheet.Cells[row + 4, "B"].Value.ToString();
-            dateFirma.NrInmatriculare = dateWorksheet.Cells[row + 5, "B"].Value.ToString();
-            dateFirma.CodCAEN = dateWorksheet.Cells[row + 6, "B"].Value.ToString();
-            _centralizator.DateFirma = dateFirma;
-          }
-          else if ((dateWorksheet.Cells[row, "A"].Value ?? "").Trim() == "Denumiri anterioare") {
-            _currentAction = "Parcurgere meta date: Denumiri anterioare";
-            foundDenumiri = true;
-            var dateFirma = _centralizator.DateFirma;
-            while (true) {
-              if (worksheet.Cells[row, "B"].Value2 == null)
-                break;
-              dateFirma.DenumiriAnterioare.Add(
-                worksheet.Cells[row, "B"].Value2.ToString()
-              );
-              row++;
-            }
-            _centralizator.DateFirma = dateFirma;
-          }
-          row++;
+
+        // Read company data using adapter
+        _currentAction = "Parcurgere meta date: Date Arvutil";
+        var dateFirma = adapter.ReadDateFirma(dateWorksheet);
+        if (dateFirma != null) {
+          _centralizator.DateFirma = dateFirma;
         }
-        _currentAction = "Cautare meta date: Date Arvutil, si Denumiri anterioare";
-        if (!foundDate) {
-          //throw new InvalidOperationException("Nu s-au gasit datele Arvutil");
+        else {
           ReportWarning(new GenericWarning("Nu s-au gasit datele Arvutil! Se completeaza cu valori prestabilite."));
           _centralizator.DateFirma = DateFirma.GetDefault();
         }
-        if (!foundDenumiri)
+
+        // Read previous names using adapter
+        _currentAction = "Parcurgere meta date: Denumiri anterioare";
+        var denumiriAnterioare = adapter.ReadDenumiriAnterioare(dateWorksheet);
+        if (denumiriAnterioare.Count > 0) {
+          _centralizator.DateFirma.DenumiriAnterioare = denumiriAnterioare;
+        }
+        else {
           ReportWarning(new GenericWarning("Nu s-au gasit denumirile anterioare. Nu se completeaza."));
+        }
       }
       catch (Exception) {
         //throw new DataFormatException("Datele meta ale firmei nu sunt formatate corect!", _currentAction, ex);
@@ -122,12 +107,12 @@ namespace ArhivUtility {
       }
 
       ReportProgress(10, "- Se numara randurile...");
-      // estimate the row count
+      // estimate the row count using adapter's termination column
       _currentAction = "Estimarea numarului de randuri in centralizator";
       row = 2;
       int rowCount = 0;
       while (true) {
-        if (worksheet.Cells[row, "O"].Value == null)
+        if (worksheet.Cells[row, adapter.TerminationColumn].Value == null)
           break;
         row++;
         rowCount++;
@@ -137,64 +122,14 @@ namespace ArhivUtility {
       int inexistentUACount = 0;
       // percentage range: 10 - 100
       try {
-        // detect whether it's the new format or the old format
-        _currentAction = "Determinarea formatului centralizatorului";
-        //bool oldFormat = true;
-        /*if (new string[] {"Serviciile", "Servicii"}.ToList().Contains(
-						worksheet.Cells[1, "H"].Value.ToString().Trim()))
-					oldFormat = false;*/
         _currentAction = "Parcurgerea randurilor centralizatorului";
         for (int i = 0; i < rowCount; i++) {
           row = i + 2;
           _currentAction = $"Parcurgerea randului {row} din centralizator";
-          var data = new CentralizatorItemData();
-          string uavalue;
-          data.RowNumber = row;
-          //data.Compartiment = worksheet.Cells[row, (oldFormat) ? "G" : "H"].Value.ToString().Trim().ToUpper();
-          // string join the Directie and Compartiment into the CentralizatorItemData
-          //string[] compartParts = new string[] {
-          //	worksheet.Cells[row, "G"].Value != null ?
-          //	worksheet.Cells[row, "G"].Value.ToString().ToUpper() :
-          //	null,
-          //	worksheet.Cells[row, "H"].Value != null ?
-          //	worksheet.Cells[row, "H"].Value.ToString().ToUpper() :
-          //	null
-          //};
-          //data.Compartiment = String.Join(" ", compartParts).Trim();
-          string directia = worksheet.Cells[row, "G"].Value != null ?
-            worksheet.Cells[row, "G"].Value.ToString().ToUpper() :
-            null;
-          string compartiment = worksheet.Cells[row, "H"].Value != null ?
-            worksheet.Cells[row, "H"].Value.ToString().ToUpper() :
-            null;
-          data.Directia = directia;
-          data.Compartiment = compartiment;
-          uavalue = (worksheet.Cells[row, "L"].Value ?? 0).ToString();
-          if (uavalue == null || uavalue.Trim() == "")
-            uavalue = "0";
-          data.NrUA = uavalue;
-          data.ErrorOnDateExtreme = false;
-          data.ErrorOnNrUA = data.NrUA == "0";
-          data.ErrorOnIndicativ = false;
-          data.Indicativ = worksheet.Cells[row, "N"].Value != null ?
-            worksheet.Cells[row, "N"].Value.ToString() : // this fuckery might not be needed but i ain't risking shit
-            "";
-          data.Continut = worksheet.Cells[row, "O"].Value.ToString();
-          data.DateExtreme = Convert.ToString(worksheet.Cells[row, "P"].Value2);
-          data.NrFile = (int)(Convert.ToDouble(worksheet.Cells[row, "Q"].Value) ?? 0.0);
-          data.Observatii = worksheet.Cells[row, "R"].Value != null ?
-            worksheet.Cells[row, "R"].Value.ToString() :
-            "";
-          data.AnInceput = Convert.ToInt32(worksheet.Cells[row, "U"].Value.ToString());
-          data.AnSfarsit = Convert.ToInt32(worksheet.Cells[row, "V"].Value.ToString());
-          data.TermenPastrare = worksheet.Cells[row, "W"].Value.ToString().Trim().ToUpper();
-          // subfond
-          if (worksheet.Cells[row, "E"].Value != null) {
-            data.Subfond = worksheet.Cells[row, "E"].Value.ToString().Trim();
-          }
-          else {
-            data.Subfond = "";
-          }
+
+          // Use adapter to read row data
+          var data = adapter.ReadRow(worksheet, row);
+
           _centralizator.Dosare.Add(data);
           // report progress
           int progress = 10 + (int)((float)row / rowCount * 90);
@@ -211,6 +146,10 @@ namespace ArhivUtility {
         }
         _currentAction = "Inchiderea centralizatorului";
         workbook.Close(SaveChanges: false);
+      }
+      catch (DataFormatException) {
+        // Re-throw DataFormatException as-is (already has row/column info from adapter)
+        throw;
       }
       catch (Exception ex) {
         throw new DataFormatException("Eroare la parcurgerea centralizatorului!", _currentAction, ex);

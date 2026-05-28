@@ -53,6 +53,7 @@ namespace ArhivUtility {
 		public static void CreateConfiguration(string name) {
 			var config = new Configuration {
 				Centralizator = new CentralizatorConfiguration() {
+					SubfondColumn = "E",
 					OldCompartimentColumn = "G",
 					NewServicesColumn = "H",
 					NrUAColumn = "L",
@@ -76,6 +77,7 @@ namespace ArhivUtility {
 	[DisplayName("Centraliz")]
 	public class CentralizatorConfiguration {
 
+		public string SubfondColumn { get; set; }
 		public string OldCompartimentColumn { get; set; }
 		public string NewServicesColumn { get; set; }
 		public string NrUAColumn { get; set; }

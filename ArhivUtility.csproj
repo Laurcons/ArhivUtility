@@ -54,6 +54,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adapters\ICentralizatorAdapter.cs" />
+    <Compile Include="Adapters\CentralizatorAdapterBase.cs" />
+    <Compile Include="Adapters\DefaultCentralizatorAdapter.cs" />
+    <Compile Include="Adapters\OldFormatCentralizatorAdapter.cs" />
+    <Compile Include="Adapters\CentralizatorAdapterFactory.cs" />
     <Compile Include="AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -148,6 +153,7 @@
     <EmbeddedResource Include="WarningsForm.resx">
       <DependentUpon>WarningsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="Docs\improvements-2026-01-25.md" />
     <None Include="FodyWeavers.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -212,10 +218,13 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Library\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_StartDate="2000/1/1" BuildVersion_UseGlobalSettings="True" BuildVersion_UpdateAssemblyVersion="True" />
+      <UserProperties BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UseGlobalSettings="True" BuildVersion_StartDate="2000/1/1" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
