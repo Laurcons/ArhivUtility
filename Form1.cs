@@ -151,7 +151,8 @@ namespace ArhivUtility {
           action = e.Error is DataFormatException ? ((DataFormatException)e.Error).Action : "none",
           inner = e.Error.InnerException != null ? e.Error.InnerException.Message : "none"
         });
-        // open a file stream and try to write data about the exception
+        // open a file stream and try to write data
+        // the exception
         try {
           string fileText = "";
           if (e.Error.InnerException != null) {
@@ -376,6 +377,10 @@ namespace ArhivUtility {
         return;
       }
       new CloseExcelForm().ShowDialog();
+    }
+
+    private void noutatiToolStripMenuItem_Click(object sender, EventArgs e) {
+      new NewsForm().ShowDialog();
     }
   }
 }

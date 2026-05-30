@@ -57,6 +57,7 @@
       this.loadWorker = new System.ComponentModel.BackgroundWorker();
       this.splitContainer1 = new System.Windows.Forms.SplitContainer();
       this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+      this.noutatiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.rtbContext.SuspendLayout();
       this.groupBox1.SuspendLayout();
       this.groupBox2.SuspendLayout();
@@ -349,6 +350,7 @@
       // 
       this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.unelteToolStripMenuItem,
+            this.noutatiToolStripMenuItem,
             this.despreToolStripMenuItem});
       this.menuStrip.Location = new System.Drawing.Point(0, 0);
       this.menuStrip.Name = "menuStrip";
@@ -409,6 +411,13 @@
       this.toolTip1.AutoPopDelay = 100000;
       this.toolTip1.InitialDelay = 0;
       this.toolTip1.ReshowDelay = 100;
+      // 
+      // noutatiToolStripMenuItem
+      // 
+      this.noutatiToolStripMenuItem.Name = "noutatiToolStripMenuItem";
+      this.noutatiToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
+      this.noutatiToolStripMenuItem.Text = "Noutati";
+      this.noutatiToolStripMenuItem.Click += new System.EventHandler(this.noutatiToolStripMenuItem_Click);
       // 
       // Form1
       // 
@@ -477,6 +486,7 @@
 		private System.Windows.Forms.ToolStripMenuItem unelteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem closeOpenExcelsToolStripMenuItem;
 		private System.Windows.Forms.CheckBox checkIndicativeCheckBox;
-	}
+    private System.Windows.Forms.ToolStripMenuItem noutatiToolStripMenuItem;
+  }
 }
 
