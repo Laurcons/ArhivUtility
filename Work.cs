@@ -107,16 +107,13 @@ namespace ArhivUtility {
       }
 
       ReportProgress(10, "- Se numara randurile...");
-      // estimate the row count using adapter's termination column
       _currentAction = "Estimarea numarului de randuri in centralizator";
-      row = 2;
-      int rowCount = 0;
-      while (true) {
-        if (worksheet.Cells[row, adapter.TerminationColumn].Value == null)
-          break;
-        row++;
-        rowCount++;
-      }
+      Excel.Range firstDataCell = (Excel.Range)worksheet.Cells[2, adapter.TerminationColumn];
+      Excel.Range secondDataCell = (Excel.Range)worksheet.Cells[3, adapter.TerminationColumn];
+      Excel.Range endCell = firstDataCell.End[Excel.XlDirection.xlDown];
+      int rowCount = secondDataCell.Value == null
+        ? (firstDataCell.Value != null ? 1 : 0)
+        : endCell.Row - 1;
 
       ReportProgress(10, $"- Se parcurg {rowCount} randuri...");
       int inexistentUACount = 0;
