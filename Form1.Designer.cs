@@ -51,7 +51,6 @@
       this.tp_long = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.panel = new System.Windows.Forms.Panel();
       this.menuStrip = new System.Windows.Forms.MenuStrip();
-      this.knownIssuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.unelteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.closeOpenExcelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.despreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -349,7 +348,6 @@
       // menuStrip
       // 
       this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.knownIssuesToolStripMenuItem,
             this.unelteToolStripMenuItem,
             this.despreToolStripMenuItem});
       this.menuStrip.Location = new System.Drawing.Point(0, 0);
@@ -357,13 +355,6 @@
       this.menuStrip.Size = new System.Drawing.Size(959, 24);
       this.menuStrip.TabIndex = 7;
       this.menuStrip.Text = "menuStrip2";
-      // 
-      // knownIssuesToolStripMenuItem
-      // 
-      this.knownIssuesToolStripMenuItem.Name = "knownIssuesToolStripMenuItem";
-      this.knownIssuesToolStripMenuItem.Size = new System.Drawing.Size(128, 20);
-      this.knownIssuesToolStripMenuItem.Text = "Probleme cunoscute";
-      this.knownIssuesToolStripMenuItem.Click += new System.EventHandler(this.knownIssuesToolStripMenuItem_Click);
       // 
       // unelteToolStripMenuItem
       // 
@@ -482,7 +473,6 @@
 		private System.Windows.Forms.ToolStripMenuItem stergeTotToolStripMenuItem;
 		private System.Windows.Forms.SplitContainer splitContainer1;
 		private System.Windows.Forms.CheckBox displayWarningsInInventareCheckBox;
-		private System.Windows.Forms.ToolStripMenuItem knownIssuesToolStripMenuItem;
 		private System.Windows.Forms.ToolTip toolTip1;
 		private System.Windows.Forms.ToolStripMenuItem unelteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem closeOpenExcelsToolStripMenuItem;
