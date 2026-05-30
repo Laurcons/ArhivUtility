@@ -34,12 +34,9 @@ namespace ArhivUtility.Adapters {
     bool CanHandle(Excel._Worksheet worksheet);
 
     /// <summary>
-    /// Reads a single row of data from the centralizator worksheet.
+    /// Reads all data rows from the centralizator worksheet in a single bulk range read.
     /// </summary>
-    /// <param name="worksheet">The worksheet to read from.</param>
-    /// <param name="row">The row number (1-based).</param>
-    /// <returns>The parsed row data.</returns>
-    CentralizatorItemData ReadRow(Excel._Worksheet worksheet, int row);
+    List<CentralizatorItemData> ReadAllRows(Excel._Worksheet worksheet, int startRow, int rowCount);
 
     /// <summary>
     /// Reads company data from the "Date identificare" worksheet.

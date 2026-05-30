@@ -120,16 +120,15 @@ namespace ArhivUtility {
       // percentage range: 10 - 100
       try {
         _currentAction = "Parcurgerea randurilor centralizatorului";
-        for (int i = 0; i < rowCount; i++) {
+        var allRows = adapter.ReadAllRows(worksheet, 2, rowCount);
+        for (int i = 0; i < allRows.Count; i++) {
           row = i + 2;
           _currentAction = $"Parcurgerea randului {row} din centralizator";
 
-          // Use adapter to read row data
-          var data = adapter.ReadRow(worksheet, row);
+          var data = allRows[i];
 
           _centralizator.Dosare.Add(data);
-          // report progress
-          int progress = 10 + (int)((float)row / rowCount * 90);
+          int progress = 10 + (int)((float)(i + 1) / rowCount * 90);
           ReportProgress(progress);
           // if nrUA is 0, send a warning
           if (data.NrUA == "0") {

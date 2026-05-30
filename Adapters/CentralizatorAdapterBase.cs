@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ArhivUtility.Adapters {
@@ -32,56 +33,61 @@ namespace ArhivUtility.Adapters {
 
     public abstract bool CanHandle(Excel._Worksheet worksheet);
 
-    /// <summary>
-    /// Reads a single row from the centralizator using the column mappings.
-    /// </summary>
-    public virtual CentralizatorItemData ReadRow(Excel._Worksheet worksheet, int row) {
+    public virtual List<CentralizatorItemData> ReadAllRows(Excel._Worksheet worksheet, int startRow, int rowCount) {
+      var colIndices = new[] {
+        SubfondColumn, DirectiaColumn, CompartimentColumn, NrUAColumn,
+        IndicativColumn, ContinutColumn, DateExtremeColumn, NrFileColumn,
+        ObservatiiColumn, AnInceputColumn, AnSfarsitColumn, TermenPastrareColumn
+      }.Where(c => !string.IsNullOrEmpty(c)).Select(ColLetterToIndex).ToList();
+
+      int minCol = colIndices.Min();
+      int maxCol = colIndices.Max();
+
+      Excel.Range range = worksheet.Range[
+        worksheet.Cells[startRow, minCol],
+        worksheet.Cells[startRow + rowCount - 1, maxCol]
+      ];
+      object[,] values = (object[,])range.Value;
+      object[,] value2s = (object[,])range.Value2;
+
+      var result = new List<CentralizatorItemData>(rowCount);
+      for (int i = 0; i < rowCount; i++)
+        result.Add(ReadRow(values, value2s, startRow + i, i + 1, minCol));
+      return result;
+    }
+
+    protected virtual CentralizatorItemData ReadRow(object[,] values, object[,] value2s, int sheetRow, int arrayRow, int minCol) {
       var data = new CentralizatorItemData();
-      data.RowNumber = row;
+      data.RowNumber = sheetRow;
 
-      // Subfond (optional)
-      data.Subfond = ReadCellAsString(worksheet, row, SubfondColumn, "Subfond") ?? "";
+      data.Subfond = ReadCellAsString(values, arrayRow, SubfondColumn, minCol, "Subfond") ?? "";
 
-      // Directia (optional, uppercase)
-      string directia = ReadCellAsString(worksheet, row, DirectiaColumn, "Directia");
+      string directia = ReadCellAsString(values, arrayRow, DirectiaColumn, minCol, "Directia");
       data.Directia = directia?.ToUpper() ?? "";
 
-      // Compartiment (uppercase)
-      string compartiment = ReadCellAsString(worksheet, row, CompartimentColumn, "Compartiment");
+      string compartiment = ReadCellAsString(values, arrayRow, CompartimentColumn, minCol, "Compartiment");
       data.Compartiment = compartiment?.ToUpper() ?? "";
 
-      // NrUA (defaults to "0" if empty)
-      string uaValue = ReadCellAsString(worksheet, row, NrUAColumn, "NrUA") ?? "0";
+      string uaValue = ReadCellAsString(values, arrayRow, NrUAColumn, minCol, "NrUA") ?? "0";
       if (string.IsNullOrWhiteSpace(uaValue))
         uaValue = "0";
       data.NrUA = uaValue;
       data.ErrorOnNrUA = data.NrUA == "0";
 
-      // Indicativ (optional)
-      data.Indicativ = ReadCellAsString(worksheet, row, IndicativColumn, "Indicativ") ?? "";
+      data.Indicativ = ReadCellAsString(values, arrayRow, IndicativColumn, minCol, "Indicativ") ?? "";
       data.ErrorOnIndicativ = false;
 
-      // Continut (required - termination detector)
-      data.Continut = ReadCellAsStringRequired(worksheet, row, ContinutColumn, "Continut");
-
-      // DateExtreme
-      data.DateExtreme = ReadCellAsValue2StringRequired(worksheet, row, DateExtremeColumn, "DateExtreme");
+      data.Continut = ReadCellAsStringRequired(values, arrayRow, ContinutColumn, minCol, sheetRow, "Continut");
+      data.DateExtreme = ReadCellAsValue2StringRequired(value2s, arrayRow, DateExtremeColumn, minCol, sheetRow, "DateExtreme");
       data.ErrorOnDateExtreme = false;
 
-      // NrFile (integer)
-      data.NrFile = ReadCellAsInt(worksheet, row, NrFileColumn, "NrFile");
+      data.NrFile = ReadCellAsInt(values, arrayRow, NrFileColumn, minCol, sheetRow, "NrFile");
+      data.Observatii = ReadCellAsString(values, arrayRow, ObservatiiColumn, minCol, "Observatii") ?? "";
 
-      // Observatii (optional)
-      data.Observatii = ReadCellAsString(worksheet, row, ObservatiiColumn, "Observatii") ?? "";
+      data.AnInceput = ReadCellAsIntRequired(values, arrayRow, AnInceputColumn, minCol, sheetRow, "AnInceput");
+      data.AnSfarsit = ReadCellAsIntRequired(values, arrayRow, AnSfarsitColumn, minCol, sheetRow, "AnSfarsit");
 
-      // AnInceput (integer, required)
-      data.AnInceput = ReadCellAsIntRequired(worksheet, row, AnInceputColumn, "AnInceput");
-
-      // AnSfarsit (integer, required)
-      data.AnSfarsit = ReadCellAsIntRequired(worksheet, row, AnSfarsitColumn, "AnSfarsit");
-
-      // TermenPastrare (uppercase, trimmed)
-      string termenPastrare = ReadCellAsStringRequired(worksheet, row, TermenPastrareColumn, "TermenPastrare");
+      string termenPastrare = ReadCellAsStringRequired(values, arrayRow, TermenPastrareColumn, minCol, sheetRow, "TermenPastrare");
       data.TermenPastrare = termenPastrare.Trim().ToUpper();
 
       return data;
@@ -134,6 +140,81 @@ namespace ArhivUtility.Adapters {
     }
 
     #region Helper Methods
+
+    protected static int ColLetterToIndex(string col) {
+      int index = 0;
+      foreach (char c in col.ToUpper())
+        index = index * 26 + (c - 'A' + 1);
+      return index;
+    }
+
+    private object GetArrayCell(object[,] arr, int arrayRow, string col, int minCol) {
+      return arr[arrayRow, ColLetterToIndex(col) - minCol + 1];
+    }
+
+    protected string ReadCellAsString(object[,] values, int arrayRow, string col, int minCol, string fieldName) {
+      if (string.IsNullOrEmpty(col)) return null;
+      try {
+        return GetArrayCell(values, arrayRow, col, minCol)?.ToString();
+      }
+      catch (Exception ex) {
+        throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din coloana {col}.", $"Citire {fieldName}", ex);
+      }
+    }
+
+    protected string ReadCellAsStringRequired(object[,] values, int arrayRow, string col, int minCol, int sheetRow, string fieldName) {
+      string value = ReadCellAsString(values, arrayRow, col, minCol, fieldName);
+      if (value == null)
+        throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din randul {sheetRow}, coloana {col}. Valoarea lipseste.", $"Citire {fieldName}");
+      return value;
+    }
+
+    protected string ReadCellAsValue2String(object[,] value2s, int arrayRow, string col, int minCol, string fieldName) {
+      if (string.IsNullOrEmpty(col)) return null;
+      try {
+        var v = GetArrayCell(value2s, arrayRow, col, minCol);
+        return v == null ? null : Convert.ToString(v);
+      }
+      catch (Exception ex) {
+        throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din coloana {col}.", $"Citire {fieldName}", ex);
+      }
+    }
+
+    protected string ReadCellAsValue2StringRequired(object[,] value2s, int arrayRow, string col, int minCol, int sheetRow, string fieldName) {
+      string value = ReadCellAsValue2String(value2s, arrayRow, col, minCol, fieldName);
+      if (value == null)
+        throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din randul {sheetRow}, coloana {col}. Valoarea lipseste.", $"Citire {fieldName}");
+      return value;
+    }
+
+    protected int ReadCellAsInt(object[,] values, int arrayRow, string col, int minCol, int sheetRow, string fieldName) {
+      if (string.IsNullOrEmpty(col)) return 0;
+      object cellValue = null;
+      try {
+        cellValue = GetArrayCell(values, arrayRow, col, minCol);
+        if (cellValue == null) return 0;
+        return Convert.ToInt32(Convert.ToDouble(cellValue));
+      }
+      catch (Exception) {
+        throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din randul {sheetRow}, coloana {col}. Valoare: '{cellValue}'", $"Citire {fieldName}");
+      }
+    }
+
+    protected int ReadCellAsIntRequired(object[,] values, int arrayRow, string col, int minCol, int sheetRow, string fieldName) {
+      if (string.IsNullOrEmpty(col))
+        throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din randul {sheetRow}. Coloana nu este configurata.", $"Citire {fieldName}");
+      object cellValue = null;
+      try {
+        cellValue = GetArrayCell(values, arrayRow, col, minCol);
+        if (cellValue == null)
+          throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din randul {sheetRow}, coloana {col}. Valoarea lipseste.", $"Citire {fieldName}");
+        return Convert.ToInt32(Convert.ToDouble(cellValue));
+      }
+      catch (DataFormatException) { throw; }
+      catch (Exception) {
+        throw new DataFormatException($"Eroare la citirea campului '{fieldName}' din randul {sheetRow}, coloana {col}. Valoare: '{cellValue}'", $"Citire {fieldName}");
+      }
+    }
 
     /// <summary>
     /// Reads a cell value as string. Returns null if cell is empty.

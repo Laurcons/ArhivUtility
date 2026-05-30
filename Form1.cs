@@ -365,10 +365,6 @@ namespace ArhivUtility {
       rtb.Height = this.Height - 256;
     }
 
-    private void knownIssuesToolStripMenuItem_Click(object sender, EventArgs e) {
-      new KnownIssuesForm().ShowDialog();
-    }
-
     private void generateRegistruCheckbox_CheckedChanged(object sender, EventArgs e) {
       generateDateCheckbox.Enabled = generateRegistruCheckbox.Checked;
       generateDateCheckbox.Checked = false;
