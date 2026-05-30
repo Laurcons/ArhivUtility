@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using ArhivUtility.Adapters;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -29,12 +30,19 @@ namespace ArhivUtility {
 
     public static void StopApplication(object sender = null, EventArgs e = null) {
       try {
-        if (_application != null)
+        if (_application != null) {
           _application.Quit();
-        _application = null;
+          Marshal.ReleaseComObject(_application);
+        }
       }
       catch (Exception) {
-
+      }
+      finally {
+        _application = null;
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
       }
     }
 
