@@ -35,7 +35,7 @@ namespace ArhivUtility.Adapters {
 
       foreach (var adapter in sortedAdapters) {
         try {
-          Excel._Worksheet ws = workbook.Sheets[adapter.CentralizatorSheetName];
+          Excel._Worksheet ws = (Excel._Worksheet)workbook.Sheets[adapter.CentralizatorSheetName];
           if (adapter.CanHandle(ws)) {
             return adapter;
           }

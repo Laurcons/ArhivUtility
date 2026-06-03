@@ -131,7 +131,7 @@ namespace ArhivUtility.Adapters {
 
       int row = startRow.Value;
       while (true) {
-        var cellValue = dateWorksheet.Cells[row, "B"].Value2;
+        var cellValue = ((Excel.Range)dateWorksheet.Cells[row, "B"]).Value2;
         if (cellValue == null)
           break;
         result.Add(cellValue.ToString());
@@ -226,7 +226,7 @@ namespace ArhivUtility.Adapters {
         return null;
 
       try {
-        var cellValue = ws.Cells[row, col].Value;
+        var cellValue = ((Excel.Range)ws.Cells[row, col]).Value;
         if (cellValue == null)
           return null;
         return cellValue.ToString();
@@ -260,7 +260,7 @@ namespace ArhivUtility.Adapters {
         return null;
 
       try {
-        var cellValue = ws.Cells[row, col].Value2;
+        var cellValue = ((Excel.Range)ws.Cells[row, col]).Value2;
         if (cellValue == null)
           return null;
         return Convert.ToString(cellValue);
@@ -295,7 +295,7 @@ namespace ArhivUtility.Adapters {
 
       object cellValue = null;
       try {
-        cellValue = ws.Cells[row, col].Value;
+        cellValue = ((Excel.Range)ws.Cells[row, col]).Value;
         if (cellValue == null)
           return 0;
         return Convert.ToInt32(Convert.ToDouble(cellValue));
@@ -319,7 +319,7 @@ namespace ArhivUtility.Adapters {
 
       object cellValue = null;
       try {
-        cellValue = ws.Cells[row, col].Value;
+        cellValue = ((Excel.Range)ws.Cells[row, col]).Value;
         if (cellValue == null) {
           throw new DataFormatException(
             $"Eroare la citirea campului '{fieldName}' din randul {row}, coloana {col}. Valoarea lipseste.",
@@ -342,7 +342,7 @@ namespace ArhivUtility.Adapters {
     /// </summary>
     protected int? FindRowWithLabel(Excel._Worksheet ws, string col, string label, int maxRows = 200) {
       for (int row = 1; row <= maxRows; row++) {
-        var cellValue = ws.Cells[row, col].Value;
+        var cellValue = ((Excel.Range)ws.Cells[row, col]).Value;
         if (cellValue != null && cellValue.ToString().Trim() == label) {
           return row;
         }
@@ -355,7 +355,7 @@ namespace ArhivUtility.Adapters {
     /// </summary>
     protected string ReadHeaderCell(Excel._Worksheet ws, int row, string col) {
       try {
-        var cellValue = ws.Cells[row, col].Value;
+        var cellValue = ((Excel.Range)ws.Cells[row, col]).Value;
         if (cellValue == null)
           return null;
         return cellValue.ToString().Trim();

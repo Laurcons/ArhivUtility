@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        shell: pwsh
+        run: |
+          $content = Get-Content Properties/AssemblyInfo.cs -Raw
+          $match = [regex]::Match($content, '\[assembly: AssemblyVersion\("([^"]+)"\)\]')
+          if (-not $match.Success) { Write-Error "AssemblyVersion not found"; exit 1 }
+          $parts = $match.Groups[1].Value.Split('.')
+          while ($parts.Count -lt 4) { $parts += '0' }
+          $full = $parts -join '.'
+          $dashed = $parts -join '-'
+          "version=$full" >> $env:GITHUB_OUTPUT
+          "version_dashed=$dashed" >> $env:GITHUB_OUTPUT
+          Write-Host "Version: $full"
+
+      - name: Check tag does not exist
+        shell: pwsh
+        run: |
+          $tag = "v${{ steps.version.outputs.version }}"
+          if (git tag -l $tag) {
+            Write-Error "Tag $tag already exists. Bump the version in AssemblyInfo.cs before releasing."
+            exit 1
+          }
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore ArhivUtility.csproj
+
+      - name: Build
+        run: msbuild ArhivUtility.csproj /p:Configuration=Release /p:Platform=AnyCPU
+
+      - name: Create zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path bin/Release/ArhivUtility.exe `
+            -DestinationPath ArhivUtility-${{ steps.version.outputs.version_dashed }}.zip
+
+      - name: Tag commit
+        run: |
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          files: ArhivUtility-${{ steps.version.outputs.version_dashed }}.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArhivUtility-${{ steps.version.outputs.version_dashed }}
+          path: ArhivUtility-${{ steps.version.outputs.version_dashed }}.zip
+
+      - name: Notify update endpoint
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $versionDashed = "${{ steps.version.outputs.version_dashed }}"
+          $downloadUrl = "https://github.com/${{ github.repository }}/releases/download/v${version}/ArhivUtility-${versionDashed}.zip"
+          $body = @{ version = $version; downloadUrl = $downloadUrl } | ConvertTo-Json
+          Invoke-RestMethod `
+            -Uri "https://arvutil.laurcons.ro/v1/update" `
+            -Method POST `
+            -Headers @{ Authorization = "Bearer ${{ secrets.UPDATE_API_KEY }}" } `
+            -ContentType "application/json" `
+            -Body $body

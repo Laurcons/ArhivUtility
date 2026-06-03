@@ -84,12 +84,12 @@ namespace ArhivUtility.Adapters {
     public override List<string> ReadDenumiriAnterioare(Excel._Worksheet dateWorksheet) {
       var result = new List<string>();
       for (int row = 1; row <= 200; row++) {
-        var label = dateWorksheet.Cells[row, "A"].Value;
+        var label = ((Excel.Range)dateWorksheet.Cells[row, "A"]).Value;
         if (label == null)
           continue;
         if (label.ToString().Trim().ToUpper() != "DENUMIRI ANTERIOARE")
           continue;
-        var value = dateWorksheet.Cells[row, "B"].Value;
+        var value = ((Excel.Range)dateWorksheet.Cells[row, "B"]).Value;
         if (value != null && !string.IsNullOrWhiteSpace(value.ToString()))
           result.Add(value.ToString().Trim());
       }
@@ -98,11 +98,11 @@ namespace ArhivUtility.Adapters {
 
     private string ReadLabeledCell(Excel._Worksheet ws, string label) {
       for (int row = 1; row <= 200; row++) {
-        var cellA = ws.Cells[row, "A"].Value;
+        var cellA = ((Excel.Range)ws.Cells[row, "A"]).Value;
         if (cellA == null)
           continue;
         if (cellA.ToString().Trim().ToUpper() == label.ToUpper()) {
-          var cellB = ws.Cells[row, "B"].Value;
+          var cellB = ((Excel.Range)ws.Cells[row, "B"]).Value;
           return cellB?.ToString().Trim();
         }
       }

@@ -80,7 +80,7 @@ namespace ArhivUtility {
 
       _currentAction = $"Deschidere foaie de lucru {adapter.CentralizatorSheetName} din centralizator";
       try {
-        worksheet = workbook.Sheets[adapter.CentralizatorSheetName];
+        worksheet = (Excel._Worksheet)workbook.Sheets[adapter.CentralizatorSheetName];
       }
       catch (Exception ex) {
         throw new DataFormatException("Eroare la deschiderea documentului!", _currentAction, ex);
@@ -90,7 +90,7 @@ namespace ArhivUtility {
       try {
         // find the "Date Arvutil" row in 'date identificare'
         _currentAction = $"Deschidere foaie de lucru \"{adapter.DateWorksheetName}\" din centralizator";
-        Excel._Worksheet dateWorksheet = workbook.Sheets[adapter.DateWorksheetName];
+        Excel._Worksheet dateWorksheet = (Excel._Worksheet)workbook.Sheets[adapter.DateWorksheetName];
 
         // Read company data using adapter
         _currentAction = "Parcurgere meta date: Date Arvutil";
@@ -440,7 +440,7 @@ namespace ArhivUtility {
               workbook.CheckCompatibility = false;
               // populate info part
               _currentAction = $"Scrierea informatiilor firmei in prima pagina a inventarului {compartiment} TP {termenPastrare}";
-              worksheet = workbook.Worksheets["Info"];
+              worksheet = (Excel._Worksheet)workbook.Worksheets["Info"];
               var dateFirma = _centralizator.DateFirma;
               worksheet.Cells[13, "A"] = (separateInventare ? subfond : dateFirma.Nume);
               if (!separateInventare) {
@@ -476,10 +476,10 @@ namespace ArhivUtility {
                   .NrCrt;
                 _currentAction = $"Scrierea informatiilor pe anul {anInceput} pentru {compartiment} TP {termenPastrare}";
                 // copy worksheet
-                worksheet = workbook.Worksheets["AN"];
+                worksheet = (Excel._Worksheet)workbook.Worksheets["AN"];
                 worksheet.Copy(Type.Missing, workbook.Worksheets[workbook.Worksheets.Count]);
-                workbook.Worksheets[workbook.Worksheets.Count].Name = anInceput.ToString();
-                worksheet = workbook.Worksheets[anInceput.ToString()];
+                ((Excel._Worksheet)workbook.Worksheets[workbook.Worksheets.Count]).Name = anInceput.ToString();
+                worksheet = (Excel._Worksheet)workbook.Worksheets[anInceput.ToString()];
                 // populate worksheet
                 worksheet.Cells[6, "D"] = anInceput;
                 worksheet.Cells[7, "D"] = LongTermenePastrare[termenPastrare];
@@ -488,7 +488,7 @@ namespace ArhivUtility {
                 int headerRow = 10;
                 // write the data on each row
                 foreach (var data in anData.Dosare) {
-                  Excel.Range rowRange = worksheet.Rows[headerRow];
+                  Excel.Range rowRange = (Excel.Range)worksheet.Rows[headerRow];
                   rowRange.Columns["A"] = data.NrUA;
                   rowRange.Columns["B"] = data.Indicativ;
                   rowRange.Columns["C"] = data.Continut;
@@ -500,28 +500,28 @@ namespace ArhivUtility {
                   if (writeErrors) {
                     bool hasErrors = false;
                     if (data.NrUA == "0") {
-                      rowRange.Columns["A:F"].Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
+                      ((Excel.Range)rowRange.Columns["A:F"]).Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
                       hasErrors = true;
                     }
                     if (data.IsFiller && data.ErrorOnNrUA) {
-                      rowRange.Columns["B:F"].Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
+                      ((Excel.Range)rowRange.Columns["B:F"]).Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
                       hasErrors = true;
                     }
                     if (!data.IsFiller && data.ErrorOnNrUA) {
-                      rowRange.Columns["A"].Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
+                      ((Excel.Range)rowRange.Columns["A"]).Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
                       hasErrors = true;
                     }
                     if (data.ErrorOnDateExtreme) {
-                      rowRange.Columns["D"].Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
+                      ((Excel.Range)rowRange.Columns["D"]).Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
                       hasErrors = true;
                     }
                     if (data.ErrorOnIndicativ) {
-                      rowRange.Columns["B"].Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
+                      ((Excel.Range)rowRange.Columns["B"]).Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
                       hasErrors = true;
                     }
                     if (hasErrors) {
                       // color a cell at the top red
-                      worksheet.Cells[6, "E"].Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
+                      ((Excel.Range)worksheet.Cells[6, "E"]).Interior.Color = ColorTranslator.ToOle(Color.OrangeRed);
                     }
                   }
                   // write the progress data
@@ -530,20 +530,20 @@ namespace ArhivUtility {
                   dosarCurent++;
                 }
                 // delete that additional row that gets left behind
-                worksheet.Rows[headerRow].Delete();
+                ((Excel.Range)worksheet.Rows[headerRow]).Delete();
                 int dataRows = anData.Dosare.Count;
                 // write the metadata
                 int metaRow = headerRow - 1 + dataRows + 2;
                 // get the number of pages required to print this
                 int pageCount = worksheet.PageSetup.Pages.Count;
-                string metaFormat = worksheet.Cells[metaRow, "A"].Value.ToString();
+                string metaFormat = ((Excel.Range)worksheet.Cells[metaRow, "A"]).Value.ToString();
                 worksheet.Cells[metaRow, "A"] = string.Format(metaFormat,
                   pageCount,
                   anData.Dosare.Count);
               }
               // delete the template "AN" worksheet
               _application.DisplayAlerts = false;
-              workbook.Worksheets["AN"].Delete();
+              ((Excel._Worksheet)workbook.Worksheets["AN"]).Delete();
               _application.DisplayAlerts = true;
               // close workbook
               workbook.Close(SaveChanges: true);
@@ -584,7 +584,7 @@ namespace ArhivUtility {
             _currentAction = "Initializarea popularii registrului" +
                 (separateInventare ? $" pentru subfond {subfond}" : "");
             workbook = _application.Workbooks.Open(filepath);
-            worksheet = workbook.Worksheets["Registru"];
+            worksheet = (Excel._Worksheet)workbook.Worksheets["Registru"];
             // fill the name row
             worksheet.Cells[2, "A"] = (separateInventare ? subfond : _centralizator.DateFirma.Nume);
             // fill rows
@@ -610,7 +610,7 @@ namespace ArhivUtility {
               int progress = (int)((float)currentItem++ / totalItems * 100);
               ReportProgress(progress);
             }
-            worksheet.Rows[headerRow].Delete();
+            ((Excel.Range)worksheet.Rows[headerRow]).Delete();
             workbook.Close(SaveChanges: true);
           }
           catch (Exception ex) {
