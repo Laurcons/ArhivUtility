@@ -21,7 +21,7 @@ jobs:
         shell: pwsh
         run: |
           $content = Get-Content Properties/AssemblyInfo.cs -Raw
-          $match = [regex]::Match($content, '\[assembly: AssemblyVersion\("([^"]+)"\)\]')
+          $match = [regex]::Match($content, '(?m)^\s*\[assembly: AssemblyVersion\("([^"]+)"\)\]')
           if (-not $match.Success) { Write-Error "AssemblyVersion not found"; exit 1 }
           $parts = $match.Groups[1].Value.Split('.')
           while ($parts.Count -lt 4) { $parts += '0' }
