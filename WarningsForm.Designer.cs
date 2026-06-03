@@ -39,6 +39,7 @@
 			this.generateReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.dgv = new System.Windows.Forms.DataGridView();
 			this.nrcrt = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.humanname = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.text = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.copyWorker = new System.ComponentModel.BackgroundWorker();
 			this.menuStrip1.SuspendLayout();
@@ -176,6 +177,7 @@
 			this.dgv.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
 			this.dgv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.nrcrt,
+            this.humanname,
             this.text});
 			this.dgv.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.dgv.Location = new System.Drawing.Point(0, 24);
@@ -192,9 +194,15 @@
 			this.nrcrt.Name = "nrcrt";
 			this.nrcrt.ReadOnly = true;
 			this.nrcrt.Width = 64;
-			// 
+			//
+			// humanname
+			//
+			this.humanname.HeaderText = "Tip";
+			this.humanname.Name = "humanname";
+			this.humanname.ReadOnly = true;
+			//
 			// text
-			// 
+			//
 			this.text.HeaderText = "Text avertizare";
 			this.text.Name = "text";
 			this.text.ReadOnly = true;
@@ -242,6 +250,7 @@
 		private System.Windows.Forms.ToolStripMenuItem filterSelectAllToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem filterDeselectAllToolStripMenuItem;
 		private System.Windows.Forms.DataGridViewTextBoxColumn nrcrt;
+		private System.Windows.Forms.DataGridViewTextBoxColumn humanname;
 		private System.Windows.Forms.DataGridViewTextBoxColumn text;
 		private System.Windows.Forms.ToolStripMenuItem generateReportToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem filterIncorrectIndicativToolStripMenuItem;

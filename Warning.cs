@@ -8,6 +8,7 @@ namespace ArhivUtility {
 	public abstract class Warning {
 		public abstract string Message { get; }
 		public abstract string Subfond { get; }
+		public abstract string HumanName { get; }
 		public abstract override string ToString();
 	}
 
@@ -19,6 +20,7 @@ namespace ArhivUtility {
 			Message = message;
 			Subfond = subfond;
 		}
+		public override string HumanName => "Mesaj general";
 		public override string ToString() => Message;
 	}
 
@@ -41,6 +43,7 @@ namespace ArhivUtility {
 			TermenPastrare = termenPastrare;
 			Subfond = subfond;
 		}
+		public override string HumanName => "UA necompletat";
 		public override string ToString() => "UA necompletat";
 	}
 
@@ -61,6 +64,7 @@ namespace ArhivUtility {
 			TermenPastrare = termenPastrare;
 			Subfond = subfond;
 		}
+		public override string HumanName => "UA lipsa";
 		public override string ToString() => "UA negasit";
 	}
 	public class UARepeatingWarning : Warning {
@@ -79,6 +83,7 @@ namespace ArhivUtility {
 			TermenPastrare = termenPastrare;
 			Subfond = subfond;
 		}
+		public override string HumanName => "UA duplicat";
 		public override string ToString() => "UA repetat";
 	}
 
@@ -115,6 +120,7 @@ namespace ArhivUtility {
 			TermenPastrare = data.TermenPastrare;
 			Subfond = data.Subfond;
 		}
+		public override string HumanName => "Date extreme neconcordante";
 		public override string ToString() => "Date extreme incorecte";
 	}
 
@@ -144,6 +150,7 @@ namespace ArhivUtility {
 			TermenPastrare = data.TermenPastrare;
 			Subfond = data.Subfond;
 		}
+		public override string HumanName => "Date extreme invalide";
 		public override string ToString() => "Date extreme ciudate";
 	}
 
@@ -156,6 +163,7 @@ namespace ArhivUtility {
 			Indicativ = indicativ;
 			Subfond = subfond;
 		}
+		public override string HumanName => "Indicativ TP neconcordant";
 		public override string ToString() => "TP neunic per indicativ";
 	}
 }
