@@ -12,6 +12,7 @@ namespace ArhivUtility {
       rtb.AppendText("0.2.13 (TBA)\n");
       rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Regular);
       rtb.AppendText("- [nou] Centralizatoarele \"Noi 2026\" pot fi acum citite; posibil sa existe diferite probleme, se pot raporta lui Bubu\n");
+      rtb.AppendText("- [fix] Numerele UA duplicate sunt acum corect raportate la verificare\n");
       rtb.AppendText("\n");
 
       rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Bold);

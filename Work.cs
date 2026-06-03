@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ArhivUtility.Adapters;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ArhivUtility.Adapters;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ArhivUtility {
@@ -207,7 +207,7 @@ namespace ArhivUtility {
                     .Where(data => data.NrUAInt == currentUA && !data.IsFiller);
                   if (found.Count() > 1) {
                     // there might be the case of UA's like 123 and 123A
-                    bool isDistinct = found.Distinct().Count() == found.Count();
+                    bool isDistinct = found.Select(f => f.NrUA).Distinct().Count() == found.Count();
                     int repeatCount = found.Count();
                     if (!isDistinct) {
                       ReportWarning(new UARepeatingWarning(
