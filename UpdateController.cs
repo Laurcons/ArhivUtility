@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using AutoUpdaterDotNET;
+using System.IO;
 using System.Windows.Forms;
-using AutoUpdaterDotNET;
 
 namespace ArhivUtility {
   internal static class UpdateController {
@@ -22,7 +22,7 @@ namespace ArhivUtility {
       AutoUpdater.UpdateMode = Mode.ForcedDownload;
       //AutoUpdater.ApplicationExitEvent += () => { Work.StopApplication(); };
       AutoUpdater.Synchronous = true;
-      AutoUpdater.Start("https://static.laurcons.ro/arhivutility/autoupdater.xml");
+      AutoUpdater.Start("https://arvutil.laurcons.ro/v1/update");
     }
   }
 }
