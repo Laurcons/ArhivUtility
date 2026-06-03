@@ -9,7 +9,7 @@ namespace ArhivUtility {
       rtb.AppendText("Noutati:\n\n");
 
       rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Bold);
-      rtb.AppendText("0.2.13 (TBA)\n");
+      rtb.AppendText("0.2.13 (04 iunie 2026)\n");
       rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Regular);
       rtb.AppendText("- [nou] Centralizatoarele \"Noi 2026\" pot fi acum citite; posibil sa existe diferite probleme, se pot raporta lui Bubu\n" +
         "- [fix] Numerele UA duplicate sunt acum corect raportate la verificare\n" +
