@@ -66,8 +66,6 @@ namespace ArhivUtility {
       try {
         _currentAction = "Deschidere fisier";
         workbook = _application.Workbooks.Open(filename, ReadOnly: true);
-        _currentAction = "Deschidere foaie de lucru Arhivatorul_template din centralizator";
-        worksheet = workbook.Sheets["Arhivatorul_template"];
       }
       catch (Exception ex) {
         throw new DataFormatException("Eroare la deschiderea documentului!", _currentAction, ex);
@@ -75,16 +73,24 @@ namespace ArhivUtility {
 
       ReportProgress(10, "Se parcurg datele din centralizator...");
 
-      // Auto-detect adapter based on worksheet structure
+      // Auto-detect adapter based on workbook structure
       _currentAction = "Detectare format centralizator";
-      ICentralizatorAdapter adapter = CentralizatorAdapterFactory.DetectAdapter(worksheet);
+      ICentralizatorAdapter adapter = CentralizatorAdapterFactory.DetectAdapter(workbook);
       ReportMessage($"Format detectat: {adapter.DisplayName}");
+
+      _currentAction = $"Deschidere foaie de lucru {adapter.CentralizatorSheetName} din centralizator";
+      try {
+        worksheet = workbook.Sheets[adapter.CentralizatorSheetName];
+      }
+      catch (Exception ex) {
+        throw new DataFormatException("Eroare la deschiderea documentului!", _currentAction, ex);
+      }
 
       ReportProgress(10, "- Se obtin datele firmei...");
       try {
         // find the "Date Arvutil" row in 'date identificare'
-        _currentAction = "Deschidere foaie de lucru \"Date identificare\" din centralizator";
-        Excel._Worksheet dateWorksheet = workbook.Sheets["Date identificare"];
+        _currentAction = $"Deschidere foaie de lucru \"{adapter.DateWorksheetName}\" din centralizator";
+        Excel._Worksheet dateWorksheet = workbook.Sheets[adapter.DateWorksheetName];
 
         // Read company data using adapter
         _currentAction = "Parcurgere meta date: Date Arvutil";

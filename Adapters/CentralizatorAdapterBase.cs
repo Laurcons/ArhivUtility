@@ -12,6 +12,8 @@ namespace ArhivUtility.Adapters {
     public abstract string DisplayName { get; }
     public abstract int DetectionPriority { get; }
     public abstract string TerminationColumn { get; }
+    public abstract string CentralizatorSheetName { get; }
+    public abstract string DateWorksheetName { get; }
 
     // Column mappings - to be defined by derived classes
     protected abstract string SubfondColumn { get; }
@@ -78,7 +80,7 @@ namespace ArhivUtility.Adapters {
       data.ErrorOnIndicativ = false;
 
       data.Continut = ReadCellAsStringRequired(values, arrayRow, ContinutColumn, minCol, sheetRow, "Continut");
-      data.DateExtreme = ReadCellAsValue2StringRequired(value2s, arrayRow, DateExtremeColumn, minCol, sheetRow, "DateExtreme");
+      data.DateExtreme = ReadCellAsValue2String(value2s, arrayRow, DateExtremeColumn, minCol, "DateExtreme") ?? "";
       data.ErrorOnDateExtreme = false;
 
       data.NrFile = ReadCellAsInt(values, arrayRow, NrFileColumn, minCol, sheetRow, "NrFile");

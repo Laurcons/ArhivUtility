@@ -27,6 +27,16 @@ namespace ArhivUtility.Adapters {
     string TerminationColumn { get; }
 
     /// <summary>
+    /// Name of the worksheet containing the centralizator data.
+    /// </summary>
+    string CentralizatorSheetName { get; }
+
+    /// <summary>
+    /// Name of the worksheet containing company identification data.
+    /// </summary>
+    string DateWorksheetName { get; }
+
+    /// <summary>
     /// Checks if this adapter can handle the given worksheet format.
     /// </summary>
     /// <param name="worksheet">The worksheet to check.</param>

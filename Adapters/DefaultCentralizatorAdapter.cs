@@ -8,8 +8,10 @@ namespace ArhivUtility.Adapters {
   /// </summary>
   public class DefaultCentralizatorAdapter : CentralizatorAdapterBase {
     public override string AdapterId => "default";
-    public override string DisplayName => "Format Standard 2024";
+    public override string DisplayName => "Standard 2024";
     public override int DetectionPriority => 10;
+    public override string CentralizatorSheetName => "Arhivatorul_template";
+    public override string DateWorksheetName => "Date identificare";
     public override string TerminationColumn => "O";
 
     // Column mappings for current format

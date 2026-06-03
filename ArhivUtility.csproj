@@ -74,6 +74,7 @@
     <Compile Include="Adapters\DefaultCentralizatorAdapter.cs" />
     <Compile Include="Adapters\OldFormatCentralizatorAdapter.cs" />
     <Compile Include="Adapters\CentralizatorAdapterFactory.cs" />
+    <Compile Include="Adapters\New2026CentralizatorAdapter.cs" />
     <Compile Include="AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>

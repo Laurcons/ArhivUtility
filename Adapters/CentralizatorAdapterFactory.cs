@@ -13,7 +13,8 @@ namespace ArhivUtility.Adapters {
     static CentralizatorAdapterFactory() {
       _adapters = new List<ICentralizatorAdapter> {
         new DefaultCentralizatorAdapter(),
-        new OldFormatCentralizatorAdapter()
+        new OldFormatCentralizatorAdapter(),
+        new New2026CentralizatorAdapter()
       };
     }
 
@@ -23,23 +24,24 @@ namespace ArhivUtility.Adapters {
     public static IReadOnlyList<ICentralizatorAdapter> Adapters => _adapters.AsReadOnly();
 
     /// <summary>
-    /// Auto-detects the correct adapter for the given worksheet.
-    /// Iterates through adapters by priority (highest first) and returns the first matching one.
+    /// Auto-detects the correct adapter for the given workbook by trying each adapter's
+    /// declared sheet name and running CanHandle. Iterates by priority (highest first).
     /// </summary>
-    /// <param name="worksheet">The worksheet to analyze.</param>
+    /// <param name="workbook">The workbook to analyze.</param>
     /// <returns>The detected adapter.</returns>
-    /// <exception cref="DataFormatException">Thrown when no adapter can handle the worksheet format.</exception>
-    public static ICentralizatorAdapter DetectAdapter(Excel._Worksheet worksheet) {
+    /// <exception cref="DataFormatException">Thrown when no adapter can handle the workbook format.</exception>
+    public static ICentralizatorAdapter DetectAdapter(Excel._Workbook workbook) {
       var sortedAdapters = _adapters.OrderByDescending(a => a.DetectionPriority);
 
       foreach (var adapter in sortedAdapters) {
         try {
-          if (adapter.CanHandle(worksheet)) {
+          Excel._Worksheet ws = workbook.Sheets[adapter.CentralizatorSheetName];
+          if (adapter.CanHandle(ws)) {
             return adapter;
           }
         }
         catch {
-          // Ignore detection errors and try next adapter
+          // Sheet not found or detection error — try next adapter
         }
       }
 

@@ -7,8 +7,10 @@ namespace ArhivUtility.Adapters {
   /// </summary>
   public class OldFormatCentralizatorAdapter : CentralizatorAdapterBase {
     public override string AdapterId => "old-format";
-    public override string DisplayName => "Format Vechi (pre-2024)";
+    public override string DisplayName => "Alternativ 2024";
     public override int DetectionPriority => 5;
+    public override string CentralizatorSheetName => "Arhivatorul_template";
+    public override string DateWorksheetName => "Date identificare";
     public override string TerminationColumn => "O";
 
     // Column mappings for old format
