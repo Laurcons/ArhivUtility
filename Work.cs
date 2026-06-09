@@ -122,6 +122,8 @@ namespace ArhivUtility {
 
       ReportProgress(10, "- Se numara randurile...");
       _currentAction = "Estimarea numarului de randuri in centralizator";
+      if (worksheet.AutoFilterMode)
+        worksheet.ShowAllData();
       Excel.Range firstDataCell = (Excel.Range)worksheet.Cells[2, adapter.TerminationColumn];
       Excel.Range secondDataCell = (Excel.Range)worksheet.Cells[3, adapter.TerminationColumn];
       Excel.Range endCell = firstDataCell.End[Excel.XlDirection.xlDown];

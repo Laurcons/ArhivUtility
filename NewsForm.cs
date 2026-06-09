@@ -9,6 +9,12 @@ namespace ArhivUtility {
       rtb.AppendText("Noutati:\n\n");
 
       rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Bold);
+      rtb.AppendText("0.2.13.1 (09 iunie 2026)\n");
+      rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Regular);
+      rtb.AppendText("- [fix] Randurile filtrate in centralizator sunt acum citite complet\n");
+      rtb.AppendText("\n");
+
+      rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Bold);
       rtb.AppendText("0.2.13 (04 iunie 2026)\n");
       rtb.SelectionFont = new Font("Microsoft Sans Serif", 12f, FontStyle.Regular);
       rtb.AppendText("- [nou] Centralizatoarele \"Noi 2026\" pot fi acum citite; posibil sa existe diferite probleme, se pot raporta lui Bubu\n" +
