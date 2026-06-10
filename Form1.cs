@@ -22,7 +22,7 @@ namespace ArhivUtility {
       Warnings = new List<Warning>();
       // get version
       var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-      Text = $"ArhivUtility - versiunea {version.Major}.{version.Minor}.{version.Build}";
+      Text = $"ArhivUtility - versiunea {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
       // put today's date on the date time picker
       registreDatePicker.Value = DateTime.Today;
       panel.Enabled = false;
